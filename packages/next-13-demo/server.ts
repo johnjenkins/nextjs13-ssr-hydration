@@ -1,11 +1,11 @@
-import { createServer } from "http";
-import { parse } from "url";
-import next from "next";
+import { createServer } from 'http';
+import { parse } from 'url';
+import next from 'next';
 // Import Stencil's Hydrate
-import { renderToString } from "@matt/stencil-components/hydrate";
+import { renderToString } from '@matt/stencil-components/hydrate';
 
-const port = parseInt(process.env.PORT || "3000", 10);
-const dev = process.env.NODE_ENV !== "production";
+const port = parseInt(process.env.PORT || '3000', 10);
+const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -17,16 +17,15 @@ app.prepare().then(() => {
       req,
       res,
       parsedUrl.pathname!,
-      parsedUrl.query
+      parsedUrl.query,
     );
     // Stencil
-    const renderedHtml = await renderToString(html, {
-      prettyHtml: false,
-      removeHtmlComments: true,
-      clientHydrateAnnotations: false,
-    });
+    const renderedHtml = await renderToString(html);
     // THIS IS WHAT WILL BREAK
-    if (parsedUrl.pathname?.startsWith("/_next") || parsedUrl.pathname?.startsWith("/__next")) {
+    if (
+      parsedUrl.pathname?.startsWith('/_next') ||
+      parsedUrl.pathname?.startsWith('/__next')
+    ) {
       await handle(req, res, parsedUrl);
     } else {
       res.end(renderedHtml.html);
@@ -37,7 +36,7 @@ app.prepare().then(() => {
 
   console.log(
     `> Server listening at http://localhost:${port} as ${
-      dev ? "development" : process.env.NODE_ENV
-    }`
+      dev ? 'development' : process.env.NODE_ENV
+    }`,
   );
 });

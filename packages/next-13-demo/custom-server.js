@@ -26,8 +26,44 @@ app.prepare().then(() => {
 
   server.all('*', async (req, res) => {
     const html = await app.renderToHTML(req, res, req.path, req.query);
-    const renderedHtml = await stencil.renderToString(html);
-    return res.send(renderedHtml.html);
+
+    // generate a 'DOM' and insert next generated html into it
+    const win = stencil.createWindowFromHtml('', 'stencil-ssr')
+    const document = win.document
+    const bodyElement = document.body
+    const headElement = document.head
+
+    const nextHeader = html.match(/(?<=<head([^>]+)?>)((.|\n)*?)(?=<\/head>)/g)
+    const nextBody = /<body([^>]+)?>((.|\n)*?)<\/body>/g.exec(html)
+
+    if (nextHeader) {
+      // head
+      headElement.innerHTML = nextHeader[0];
+    }
+
+    if (nextBody) {
+      // main body content
+      if (nextBody[2]) bodyElement.innerHTML = nextBody[2];
+
+      // body tag attributes
+      if (nextBody[1]) {
+        const el = document.createElement('html');
+        el.innerHTML = `<div ${nextBody[1]}></div>`;
+
+        const attrs = Array.from(el.getElementsByTagName('div')[0].attributes);
+        attrs.forEach(attr => bodyElement.setAttribute(attr.name, attr.value));
+      }
+    }
+
+    // hydrate stencil components mpw
+    await stencil.renderToString(document);
+
+    // pick out stencil style tags and add them to body so next leaves them alone
+    headElement.querySelectorAll('style[sty-id]').forEach((stencilStyle) => {
+      bodyElement.append(stencilStyle);
+    });
+    
+    return res.send(document.documentElement.outerHTML);
   });
 
   server.listen(port, (err) => {

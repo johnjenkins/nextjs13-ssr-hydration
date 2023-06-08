@@ -1,8 +1,7 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 // Import Stencil Component
-import { MyComponent } from "@matt/react-library";
-import Link from "next/link";
+import { MyTextComponent } from "@matt/react-library";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,10 +10,7 @@ export default function Home() {
     <main
       className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
     >
-      <MyComponent first="John" last="smith" middle="demo"></MyComponent>
-
-      <Link href="nice">Nice!</Link>
-
+      <MyTextComponent tag="h2">Slotted Text</MyTextComponent>
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           <span>Get started by editing</span>
